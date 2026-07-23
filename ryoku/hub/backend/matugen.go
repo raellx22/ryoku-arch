@@ -341,6 +341,7 @@ func generateMatugenTheme(imgPath string) error {
 	// Build active apps.toml filtered by user toggles in cfg.Templates
 	renderActiveTemplates(cfg, wallustMap)
 
+	syncQtAndGtkSettings(wallustMap)
 	// Trigger live updates
 	_ = exec.Command("hyprctl", "reload", "config-only").Run()
 	_ = exec.Command("pkill", "-USR1", "-x", "kitty").Run()
@@ -461,4 +462,40 @@ func renderActiveTemplates(cfg matugenConfig, pal map[string]string) {
 	_ = os.WriteFile(activeAppsToml, []byte(strings.Join(activeSections, "\n")), 0o644)
 
 	runMatugen(activeAppsToml, carrierPath)
+}
+func syncQtAndGtkSettings(pal map[string]string) {
+	dataHome := os.Getenv("XDG_DATA_HOME")
+	if dataHome == "" {
+		dataHome = filepath.Join(os.Getenv("HOME"), ".local", "share")
+	}
+	iconTheme := getGsettings("icon-theme", "Papirus-Dark")
+
+	for _, ver := range []string{"gtk-3.0", "gtk-4.0"} {
+		p := filepath.Join(configHome(), ver, "settings.ini")
+		_ = os.MkdirAll(filepath.Dir(p), 0o755)
+		content := fmt.Sprintf("[Settings]\ngtk-theme-name=Adwaita-dark\ngtk-icon-theme-name=%s\ngtk-application-prefer-dark-theme=1\n", iconTheme)
+		_ = os.WriteFile(p, []byte(content), 0o644)
+	}
+
+	colorSchemePath := filepath.Join(configHome(), "qt6ct", "colors", "ryoku.conf")
+	for _, conf := range []string{
+		filepath.Join(configHome(), "qt6ct", "qt6ct.conf"),
+		filepath.Join(configHome(), "qt5ct", "qt5ct.conf"),
+	} {
+		_ = os.MkdirAll(filepath.Dir(conf), 0o755)
+		content := fmt.Sprintf("[Appearance]\ncolor_scheme_path=%s\ncustom_palette=true\nicon_theme=%s\nstyle=Fusion\n", colorSchemePath, iconTheme)
+		_ = os.WriteFile(conf, []byte(content), 0o644)
+	}
+}
+
+func getGsettings(key, fallback string) string {
+	out, err := exec.Command("gsettings", "get", "org.gnome.desktop.interface", key).Output()
+	if err != nil {
+		return fallback
+	}
+	v := strings.Trim(strings.TrimSpace(string(out)), "'\"")
+	if v == "" {
+		return fallback
+	}
+	return v
 }
