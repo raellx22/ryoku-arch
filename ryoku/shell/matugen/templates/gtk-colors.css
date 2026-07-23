@@ -13,7 +13,7 @@
     --view-fg-color: {{colors.on_surface.default.hex}};
     --headerbar-bg-color: {{colors.surface_container.default.hex}};
     --headerbar-fg-color: {{colors.on_surface.default.hex}};
-    --headerbar-border-color: transparent;
+    --headerbar-border-color: {{colors.outline_variant.default.hex}};
     --headerbar-backdrop-color: {{colors.surface.default.hex}};
     --card-bg-color: {{colors.surface_container_low.default.hex}};
     --card-fg-color: {{colors.on_surface.default.hex}};
@@ -24,7 +24,7 @@
     --sidebar-bg-color: {{colors.surface_container_low.default.hex}};
     --sidebar-fg-color: {{colors.on_surface.default.hex}};
     --sidebar-backdrop-color: {{colors.surface_container_low.default.hex}};
-    --sidebar-border-color: transparent;
+    --sidebar-border-color: {{colors.outline_variant.default.hex}};
     --secondary-sidebar-bg-color: {{colors.surface_container_low.default.hex}};
     --secondary-sidebar-fg-color: {{colors.on_surface.default.hex}};
     --thumbnail-bg-color: {{colors.surface_container_highest.default.hex}};
@@ -79,20 +79,45 @@
 @define-color unfocused_borders {{colors.outline_variant.default.hex}};
 @define-color error_color {{colors.error.default.hex}};
 
-/* --- Direct GTK 3/4 element rule overrides for classic GNOME/Adwaita apps --- */
-window, dialog, headerbar, actionbar, stack, viewport, notebook, treeview, list, row, sidebar, .background {
+/* --- Element rules for GTK 3/4 --- */
+window, dialog, .background {
     background-color: @theme_bg_color;
     color: @theme_text_color;
 }
 
 headerbar, headerbar.titlebar {
-    background-color: @headerbar_bg_color;
-    color: @headerbar_fg_color;
+    background-color: {{colors.surface_container.default.hex}};
+    color: {{colors.on_surface.default.hex}};
+    border-bottom: 1px solid {{colors.outline_variant.default.hex}};
 }
 
-.sidebar, stack > grid, stack > box {
-    background-color: @sidebar_bg_color;
-    color: @sidebar_fg_color;
+.sidebar, sidebar, placessidebar {
+    background-color: {{colors.surface_container_low.default.hex}};
+    color: {{colors.on_surface.default.hex}};
+}
+
+button {
+    background-color: {{colors.surface_container_high.default.hex}};
+    color: {{colors.on_surface.default.hex}};
+    border: 1px solid {{colors.outline_variant.default.hex}};
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: {{colors.surface_container_highest.default.hex}};
+    color: {{colors.on_surface.default.hex}};
+}
+
+button:active, button:checked, button.suggested-action {
+    background-color: {{colors.primary.default.hex}};
+    color: {{colors.on_primary.default.hex}};
+}
+
+entry, textview, spinbutton {
+    background-color: {{colors.surface_container_low.default.hex}};
+    color: {{colors.on_surface.default.hex}};
+    border: 1px solid {{colors.outline_variant.default.hex}};
+    border-radius: 4px;
 }
 
 .nautilus-window .sidebar,
